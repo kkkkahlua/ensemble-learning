@@ -2,6 +2,7 @@ from input import Input
 from sklearn import tree
 import numpy as np
 import math
+from sklearn.metrics import roc_auc_score
 
 def calc_error(h, f, D):
 	error = np.dot(D, (abs(h-f)/2).reshape(h.shape[0]))
@@ -29,7 +30,7 @@ def weighted(alpha, predict, T, testNum):
 		else:
 			result[i] = -1
 
-	return result
+	return weightedSum, result
 
 def compare(v1, v2, num):
 	return v1.shape[0] - sum(abs(v1-v2))/2
@@ -54,7 +55,7 @@ def main():
 	for i in range(trainNum):
 		D[i] = 1/trainNum
 
-	T = 100
+	T = 300
 
 	trainPredict = np.zeros((T, trainNum))
 	testPredict = np.zeros((T, testNum))
@@ -70,7 +71,7 @@ def main():
 
 		trainPredict[i, :] = clf.predict(trainX)
 		cor[i] = compare(trainPredict[i, :], trainY, trainNum)
-		print('correct num = ', cor[i])
+	#	print('correct num = ', cor[i])
 
 		error[i], ok = calc_error(trainPredict[i, :], trainY, D)
 		if not ok:
@@ -79,17 +80,20 @@ def main():
 		D, alpha[i] = update(trainPredict[i, :], trainY, error[i], D)
 
 	output(cor, error, alpha)
-
+	'''
 	result = weighted(alpha, trainPredict, T, trainNum)
 	correct = compare(result, trainY, trainNum)
 	print('train correct num = ', correct, ', ratio = ', correct/32561)
-
+	'''
 
 	for i in range(T):
 		testPredict[i, :] = clfs[i].predict(testX)
 
-	result = weighted(alpha, testPredict, T, testNum)
+	weightedSum, result = weighted(alpha, testPredict, T, testNum)
 	correct = compare(result, testY, testNum)
 	print('test correct num = ', correct, ', ratio = ', correct/16281)
+
+	auc = roc_auc_score(testY, weightedSum)
+	print('auc = ', auc)
 
 main()

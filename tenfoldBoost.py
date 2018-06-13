@@ -31,7 +31,7 @@ def weighted(alpha, predict, T, testNum):
 		else:
 			result[i] = -1
 
-	return result
+	return weightedSum, result
 
 def compare(v1, v2, num):
 	return v1.shape[0] - sum(abs(v1-v2))/2
@@ -43,7 +43,7 @@ def main():
 
 
 	tot = 0
-	for times in range(3):
+	for times in range(5):
 		print('times = ', times)
 
 		kf = KFold(n_splits=5)
@@ -58,7 +58,7 @@ def main():
 			trainNum = X_train.shape[0]
 			testNum = X_test.shape[0]
 			
-			T = 100
+			T = 65
 
 			trainPredict = np.zeros((T, trainNum))
 			testPredict = np.zeros((T, testNum))
@@ -89,15 +89,15 @@ def main():
 			for i in range(T):
 				testPredict[i, :] = clfs[i].predict(X_test)
 
-			result = weighted(alpha, testPredict, T, testNum)
+			weightedSum, result = weighted(alpha, testPredict, T, testNum)
 
-			rocs[cur] = roc_auc_score(Y_test, result)
+			rocs[cur] = roc_auc_score(Y_test, weightedSum)
 			cur += 1
 
 			print(compare(Y_test, result, testNum), testNum)
 
 		tot += sum(rocs)/5
 
-	print(tot/3)
+	print(tot/5)
 
 main()

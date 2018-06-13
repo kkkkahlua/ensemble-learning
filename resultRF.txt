@@ -1,2 +1,7 @@
-max_features = 5, test correct num =  13902.0 , ratio =  0.853878754376
-max_features = 3, test correct num =  13946.0 , ratio =  0.856581291075
+T = 100
+test correct num =  13919.0 , ratio =  0.854922916283
+auc =  0.905146595892
+
+T = 200
+test correct num =  13945.0 , ratio =  0.856519869787
+auc =  0.905813767734

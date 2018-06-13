@@ -3,17 +3,18 @@ import random
 from sklearn import tree
 import numpy as np
 import math
+from sklearn.metrics import roc_auc_score
 
 def vote(predict, T, testNum):
-	sum = np.dot(np.ones(T), predict).reshape(testNum)
+	aveSum = np.dot(np.ones(T), predict).reshape(testNum)
 
 	result = np.zeros(testNum)
 	for i in range(testNum):
-		if sum[i] >= 0:
+		if aveSum[i] >= 0:
 			result[i] = 1
 		else:
 			result[i] = -1
-	return result
+	return aveSum, result
 
 def compare(v1, v2, num):
 	return v1.shape[0] - sum(abs(v1-v2))/2
@@ -34,23 +35,25 @@ def main():
 	trainNum = trainX.shape[0]
 	testNum = testX.shape[0]
 
-	T = 100
+	T = 300
 	clfs = list()
 	for i in range(T):
 		print('i = ', i)
 		partX, partY = bootstrap(trainX, trainY)
 		clf = tree.DecisionTreeClassifier(min_samples_split=3, max_features=3)
 		clf = clf.fit(partX, partY)
-		print(clf.feature_importances_)
 		clfs.append(clf)
 
 	testPredict = np.zeros((T, testNum))
 	for i in range(T):
 		testPredict[i, :] = clfs[i].predict(testX)
 
-	result = vote(testPredict, T, testNum)
+	aveSum, result = vote(testPredict, T, testNum)
 
 	correct = compare(result, testY, testNum)
 	print('test correct num = ', correct, ', ratio = ', correct/16281)
+
+	auc = roc_auc_score(testY, aveSum)
+	print('auc = ', auc)
 
 main()
