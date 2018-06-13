@@ -42,57 +42,62 @@ def main():
 
 
 
+	tot = 0
+	for times in range(3):
+		print('times = ', times)
 
-	kf = KFold(n_splits=5)
-	cur = 0
-	rocs = np.zeros(5)
+		kf = KFold(n_splits=5)
+		cur = 0
+		rocs = np.zeros(5)
 
-	for train_index, test_index in kf.split(trainX, trainY):
-		X_train, X_test = trainX[train_index], trainX[test_index]
-		Y_train, Y_test = trainY[train_index], trainY[test_index]
+		for train_index, test_index in kf.split(trainX, trainY):
+			print('fold = ', cur)
+			X_train, X_test = trainX[train_index], trainX[test_index]
+			Y_train, Y_test = trainY[train_index], trainY[test_index]
 
-		trainNum = X_train.shape[0]
-		testNum = X_test.shape[0]
-		
-		T = 100
+			trainNum = X_train.shape[0]
+			testNum = X_test.shape[0]
+			
+			T = 100
 
-		trainPredict = np.zeros((T, trainNum))
-		testPredict = np.zeros((T, testNum))
-		alpha = np.zeros(T)
-		cor = np.zeros(T)
-		error = np.zeros(T)
-		clfs = list()
+			trainPredict = np.zeros((T, trainNum))
+			testPredict = np.zeros((T, testNum))
+			alpha = np.zeros(T)
+			cor = np.zeros(T)
+			error = np.zeros(T)
+			clfs = list()
 
-		D = np.zeros((trainNum))
-		for i in range(trainNum):
-			D[i] = 1/trainNum
+			D = np.zeros((trainNum))
+			for i in range(trainNum):
+				D[i] = 1/trainNum
 
-		for i in range(T):
-			print('i = ', i)
-			clf = tree.DecisionTreeClassifier(min_samples_split=3)
-			clf = clf.fit(X_train, Y_train, sample_weight = D)
-			clfs.append(clf)
+			for i in range(T):
+				clf = tree.DecisionTreeClassifier(min_samples_split=3)
+				clf = clf.fit(X_train, Y_train, sample_weight = D)
+				clfs.append(clf)
 
-			trainPredict[i, :] = clf.predict(X_train)
-			cor[i] = compare(trainPredict[i, :], Y_train, trainNum)
-#			print('correct num = ', cor[i])
+				trainPredict[i, :] = clf.predict(X_train)
+				cor[i] = compare(trainPredict[i, :], Y_train, trainNum)
+	#			print('correct num = ', cor[i])
 
-			error[i], ok = calc_error(trainPredict[i, :], Y_train, D)
-			if not ok:
-				T = i
-				break
-			D, alpha[i] = update(trainPredict[i, :], Y_train, error[i], D)
+				error[i], ok = calc_error(trainPredict[i, :], Y_train, D)
+				if not ok:
+					T = i
+					break
+				D, alpha[i] = update(trainPredict[i, :], Y_train, error[i], D)
 
-		for i in range(T):
-			testPredict[i, :] = clfs[i].predict(X_test)
+			for i in range(T):
+				testPredict[i, :] = clfs[i].predict(X_test)
 
-		result = weighted(alpha, testPredict, T, testNum)
+			result = weighted(alpha, testPredict, T, testNum)
 
-		rocs[cur] = roc_auc_score(Y_test, result)
-		cur += 1
+			rocs[cur] = roc_auc_score(Y_test, result)
+			cur += 1
 
+			print(compare(Y_test, result, testNum), testNum)
 
-	print(rocs)
-	print(sum(rocs)/5)
+		tot += sum(rocs)/5
+
+	print(tot/3)
 
 main()
