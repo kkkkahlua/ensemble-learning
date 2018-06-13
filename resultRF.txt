@@ -1,0 +1,2 @@
+max_features = 5, test correct num =  13902.0 , ratio =  0.853878754376
+max_features = 3, test correct num =  13946.0 , ratio =  0.856581291075
