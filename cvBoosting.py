@@ -58,7 +58,7 @@ def main():
 			trainNum = X_train.shape[0]
 			testNum = X_test.shape[0]
 			
-			T = 65
+			T = 150
 
 			trainPredict = np.zeros((T, trainNum))
 			testPredict = np.zeros((T, testNum))

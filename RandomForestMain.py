@@ -35,7 +35,7 @@ def main():
 	trainNum = trainX.shape[0]
 	testNum = testX.shape[0]
 
-	T = 300
+	T = 200
 	clfs = list()
 	for i in range(T):
 		print('i = ', i)

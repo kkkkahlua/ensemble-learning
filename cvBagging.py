@@ -51,7 +51,7 @@ def main():
 			trainNum = X_train.shape[0]
 			testNum = X_test.shape[0]
 
-			T = 300
+			T = 150
 			clfs = list()
 			for i in range(T):
 				partX, partY = bootstrap(X_train, Y_train)

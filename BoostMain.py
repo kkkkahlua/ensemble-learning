@@ -55,7 +55,7 @@ def main():
 	for i in range(trainNum):
 		D[i] = 1/trainNum
 
-	T = 300
+	T = 50
 
 	trainPredict = np.zeros((T, trainNum))
 	testPredict = np.zeros((T, testNum))
